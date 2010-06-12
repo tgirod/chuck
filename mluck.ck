@@ -1,3 +1,8 @@
+// This is a very crude clone of the mlr app, written with Max 5 for the
+// monome. mluck is written to be used with Novation's Launchpad, the cheap
+// monome ripoff. to use mluck, you will need launchpad.ck in order to
+// communicate with the interface.
+
 class Loop
 {
 	SndBuf buf;					// the sound to play
