@@ -12,17 +12,15 @@ class Loop
 	1 => buf.loop;				// we want to loop
 	0 => int step;				// the current step
 	time nextStep;				// when we will switch to the next step
-	float bpm;					// the playback's speed
-	int beats;					// number of beats in the loop
+	int length;					// number of beats in the loop
 	UGen @ out;					// where to connect the output
 	int id;						// the id of the loop
-	Looper @ looper;			// the parent object
+	Mluck @ mluck;			// the parent object
 	
-	fun void init(string fname_, float bpm_, int beats_, UGen out_)
+	fun void init(string fname_, int length_, UGen out_)
 	{
 		fname_ => buf.read;
-		bpm_ => bpm;
-		beats_ => beats;
+		length_ => length;
 		out_ @=> out;
 		pitch();
 		1 => initialized;
@@ -31,7 +29,7 @@ class Loop
 	// duration of the loop
 	fun dur loopLength()
 	{
-		return (beats / bpm * 60)::second;
+		return (length / mluck.bpm * 60)::second;
 	}
 	
 	// duration of one step
@@ -43,21 +41,28 @@ class Loop
 	// pitch the buffer so it has the right duration
 	fun void pitch()
 	{
+		if (!initialized) return;
 		buf.length() / loopLength() => buf.rate;		
+	}
+	
+	fun void setLength(int length_)
+	{
+		length_ => length;
+		pitch();
 	}
 	
 	// starts playing
 	fun void play()
 	{
 		if (!initialized) return;
-		looper.play(id);
+		mluck.play(id);
 		buf => out;
 		1 => playing;
 		while (playing) {
 			if (now >= nextStep) {
 				step => int prev;
 				(step +1) % 8 => int next;
-				looper.step(id, prev, next);
+				mluck.step(id, prev, next);
 				next => step;
 				nextStep + stepLength() => nextStep;
 			}
@@ -71,7 +76,7 @@ class Loop
 		if (!initialized) return;
 		buf !=> out;
 		0 => playing;
-		looper.stop(id);
+		mluck.stop(id);
 	}
 	
 	// move the cursor to the step
@@ -80,7 +85,7 @@ class Loop
 		if (!initialized) return;
 		step => int prev;
 		step_ => int next;
-		looper.step(id,prev,next);
+		mluck.step(id,prev,next);
 		step_ => step;
 		step * buf.samples() / 8 => buf.pos;
 		now + stepLength() => nextStep;
@@ -88,27 +93,34 @@ class Loop
 	}
 }
 
-public class Looper
+public class Mluck
 {
 	Loop loop[8];
-	
+	float bpm;
 	Launchpad @ lp;
 	
 	for (0 => int i; i<8; i++) {
 		i => loop[i].id;
-		this @=> loop[i].looper;
+		this @=> loop[i].mluck;
+	}
+	
+	fun void init(float bpm_, Launchpad lp_)
+	{
+		bpm_ => bpm;
+		lp_ @=> lp;
 	}
 
-	fun void init(Launchpad _lp)
+	fun void setBpm(float bpm_)
 	{
-		_lp @=> lp;
+		bpm_ => bpm;
+		for (0=>int i; i<8; i++) loop[i].pitch();
 	}
 	
 	fun void play(int id)
 	{
 		lp.scene(id,3,3);
 	}
-
+	
 	fun void stop(int id)
 	{
 		lp.scene(id,0,0);
