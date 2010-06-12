@@ -96,7 +96,7 @@ public class Mluck
 
 class Track
 {
-	SndBuf buf;					// the sound to play
+	SndBuf buf => Envelope env;	// the sound to play
 	0 => int initialized;		// is the track initialized ?
 	0 => int playing;			// is the track currently playing ?
 	0.2 => buf.gain;			// the track's volume
@@ -108,6 +108,7 @@ class Track
 	int id;						// the id of the track
 	int group;					// tracks are grouped
 	Mluck @ mluck;				// the parent object
+	1::ms => env.duration;		// envelope's ramp (to avoid clipping)
 	
 	fun void init(string fname_, int length_, int group_, UGen out_)
 	{
@@ -154,8 +155,9 @@ class Track
 	{
 		if (!initialized) return;
 		mluck.playView(id);
-		buf => out;
+		env => out;
 		1 => playing;
+		env.keyOn();
 		while (playing) {
 			if (now >= nextStep) {
 				step => int prev;
@@ -172,7 +174,9 @@ class Track
 	fun void stop()
 	{
 		if (!initialized) return;
-		buf !=> out;
+		env.keyOff();
+		env.duration() => now;
+		env !=> out;
 		0 => playing;
 		mluck.stopView(id);
 	}
@@ -185,8 +189,11 @@ class Track
 		step_ => int next;
 		mluck.stepView(id,prev,next);
 		step_ => step;
+		env.keyOff();
+		env.duration() => now;
 		step * buf.samples() / 8 => buf.pos;
 		now + stepLength() => nextStep;
+		env.keyOn();
 		if (!playing) spork ~ play();
 	}
 }
