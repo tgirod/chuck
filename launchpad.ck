@@ -26,6 +26,13 @@ fun int clip(int value, int min, int max)
 	return value;
 }
 
+fun int check(int value, int min, int max)
+{
+	if (value < min) return 0;
+	if (value > max) return 0;
+	return 1;
+}
+
 fun int velocity(int red, int green, int copy, int clear)
 {
 	// red bits (0,1)
@@ -180,8 +187,8 @@ public class Launchpad
 	
 	fun void grid(int row, int col,int red, int green)
 	{
-		clip(row,0,7) => row;
-		clip(col,0,7) => col;
+		// if the coordinates are invalid, we stop right there
+		if (!check(row,0,7) || !check(col,0,7)) return;
 		
 		0x90 => msg_out.data1;
 		row*16 + col => msg_out.data2;
@@ -191,7 +198,7 @@ public class Launchpad
 
 	fun void scene(int key, int red, int green)
 	{
-		clip(key,0,7) => key;
+		if (!check(key,0,7)) return;
 		
 		0x90 => msg_out.data1;
 		key*16 + 8 => msg_out.data2;
@@ -201,7 +208,7 @@ public class Launchpad
 	
 	fun void automap(int key, int red, int green)
 	{
-		clip(key,0,7) => key;
+		if (!check(key,0,7)) return;
 		
 		0xB0 => msg_out.data1;
 		104 + key => msg_out.data2;
