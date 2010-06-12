@@ -50,6 +50,17 @@ public class Mluck
 		spork ~ sceneListen();
 		while (true) 1::second => now;
 	}
+
+	fun void groupStop(int t)
+	{
+		// stop any other track of the group that is currently playing
+		track[t].group => int group;
+		for (0=>int i; i<8; i++) {
+			if (i != t && track[i].group == group && track[i].playing) {
+				track[i].stop();
+			}
+		}
+	}
 	
 	fun void gridListen()
 	{
@@ -59,12 +70,7 @@ public class Mluck
 			lp.grid_event.col => int s; // step
 			track[t].group => int g;    // track's group
 			if (lp.grid_event.press) {
-				// stop any other track of the group that is currently playing
-				for (0=>int i; i<8; i++) {
-					if (i != t && track[i].group == g && track[i].playing) {
-						track[i].stop();
-					}
-				}
+				groupStop(t);
 				// jump around ! jump around !
 				track[t].seek(s);
 			}
@@ -76,11 +82,12 @@ public class Mluck
 		while (true) {
 			lp.scene_event => now;
 			if (lp.scene_event.press) {
-				lp.scene_event.key => int l;
-				if (track[l].playing) {
-					track[l].stop();
+				lp.scene_event.key => int t;
+				if (track[t].playing) {
+					track[t].stop();
 				} else {
-					track[l].seek(0);
+					groupStop(t);
+					track[t].seek(0);
 				}
 			}
 		}
@@ -108,8 +115,8 @@ class Track
 		length_ => length;
 		out_ @=> out;
 		group_ => group;
-		pitch();
 		1 => initialized;
+		pitch();
 	}
 	
 	// duration of the track
@@ -160,7 +167,7 @@ class Track
 			1::ms => now;
 		}
 	}
-	
+
 	// stops playing
 	fun void stop()
 	{
