@@ -116,8 +116,7 @@ public class Launchpad
 		<<< "ready" >>>;
 		while (true) {
 			midi_in => now;
-			midi_in.recv(msg_in);
-			midiHandler();
+			while (midi_in.recv(msg_in)) midiHandler();
 		}
 	}
 
