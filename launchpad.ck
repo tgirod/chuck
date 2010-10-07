@@ -51,5 +51,9 @@ public class Launchpad {
 	}
 }
 
-Std.atoi(me.arg(0)) => int port;
+0 => int port;
+if (me.args() == 1) {
+	Std.atoi(me.arg(0)) => port;
+}
+
 Launchpad.listen(port);

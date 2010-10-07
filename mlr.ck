@@ -127,6 +127,7 @@ class Track {
 		env => dac;
 		now + stepLength() => nextStep;
 		MidiInterface.turnOn(row,step);
+		MidiInterface.turnOn(row,8);
 		env.keyOn();
 		while (playing) {
 			if (now >= nextStep) {
@@ -142,6 +143,7 @@ class Track {
 		//env =< dac.chan(row);
 		env =< dac;
 		MidiInterface.turnOff(row,step);
+		MidiInterface.turnOff(row,8);
 	}
 
 	fun void start() {

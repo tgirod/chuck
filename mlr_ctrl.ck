@@ -1,9 +1,9 @@
 me.arg(0) => string cmd;
 
 if (cmd == "load") {
-	Std.atoi(me.arg(3)) => int row;
-	me.arg(1) => string fname;
-	Std.atoi(me.arg(2)) => int length;
+	Std.atoi(me.arg(1)) => int row;
+	me.arg(2) => string fname;
+	Std.atoi(me.arg(3)) => int length;
 	Std.atoi(me.arg(4)) => int group;
 	Std.atof(me.arg(5)) => float gain;
 	Mlr.load(row,fname,length,group,gain);
