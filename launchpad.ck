@@ -9,7 +9,10 @@ public class Launchpad
 	MidiMsg msg_lp_out;
 
 	//state
-
+	int matrix_button[8][8];
+	int scene_button[8];
+	int ctrl_button[8];
+	
 	fun void connect(int lp_id)
 	{
 		// open the midi ports
@@ -41,14 +44,17 @@ public class Launchpad
 				{
 					msg_lp_in.data2 - 104 => col;
 					msg_lp_in.data3 != 0 => press;
+					press => ctrl_button[col];
 					control_event(col,press);
 				} else {
 					msg_lp_in.data2 / 16 $ int => row;
 					msg_lp_in.data2 % 16 $ int => col;
 					msg_lp_in.data3 != 0 => press;
 					if (col < 8) {
+						press => matrix_button[row,col];
 						matrix_event(row,col,press);
 					} else {
+						press => scene_button[row];
 						scene_event(row,press);
 					}
 				}
@@ -82,5 +88,20 @@ public class Launchpad
 	fun void led_matrix(int row, int col, int color)
 	{
 		send3(0x90, row*16 + col, color);
+	}
+
+	fun int matrixIsPressed(int row, int col)
+	{
+		return matrix_button[row,col];
+	}
+
+	fun int sceneIsPressed(int row)
+	{
+		return scene_button[row];
+	}
+
+	fun int ctrlIsPressed(int col)
+	{
+		return ctrl_button[col];
 	}
 }
