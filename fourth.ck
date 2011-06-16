@@ -26,7 +26,7 @@ public class Fourth extends Launchpad
 		octave*12 + row + col * 4 => msg_synth_out.data2;
 		127 * press => msg_synth_out.data3;
 		synth_out.send(msg_synth_out);
-		led_matrix(row,col,press*127);
+		matrix_led(row,col,press*127);
 	}
 }
 

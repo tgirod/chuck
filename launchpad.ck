@@ -85,11 +85,21 @@ public class Launchpad
 		lp_out.send(msg_lp_out);
 	}
 
-	fun void led_matrix(int row, int col, int color)
+	fun void matrix_led(int row, int col, int color)
 	{
 		send3(0x90, row*16 + col, color);
 	}
 
+	fun void scene_led(int row, int color)
+	{
+		send3(0x90, row*16 + 8, color);
+	}
+
+	fun void ctrl_led(int col, int color)
+	{
+		send3(0xB0, 104+col, color);
+	}
+	
 	fun int matrixIsPressed(int row, int col)
 	{
 		return matrix_button[row,col];
