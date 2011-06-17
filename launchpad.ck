@@ -51,7 +51,7 @@ public class Launchpad
 					msg_lp_in.data2 % 16 $ int => col;
 					msg_lp_in.data3 != 0 => press;
 					if (col < 8) {
-						press => matrix_button[row,col];
+						press => matrix_button[row][col];
 						matrix_event(row,col,press);
 					} else {
 						press => scene_button[row];
@@ -102,7 +102,7 @@ public class Launchpad
 	
 	fun int matrixIsPressed(int row, int col)
 	{
-		return matrix_button[row,col];
+		return matrix_button[row][col];
 	}
 
 	fun int sceneIsPressed(int row)
@@ -115,3 +115,4 @@ public class Launchpad
 		return ctrl_button[col];
 	}
 }
+
