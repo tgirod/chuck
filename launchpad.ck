@@ -45,34 +45,34 @@ public class Launchpad
 					msg_lp_in.data2 - 104 => col;
 					msg_lp_in.data3 != 0 => press;
 					press => ctrl_button[col];
-					control_event(col,press);
+					controlEvent(col,press);
 				} else {
 					msg_lp_in.data2 / 16 $ int => row;
 					msg_lp_in.data2 % 16 $ int => col;
 					msg_lp_in.data3 != 0 => press;
 					if (col < 8) {
 						press => matrix_button[row][col];
-						matrix_event(row,col,press);
+						matrixEvent(row,col,press);
 					} else {
 						press => scene_button[row];
-						scene_event(row,press);
+						sceneEvent(row,press);
 					}
 				}
 			}
 		}
 	}
 
-	fun void control_event(int col, int press)
+	fun void controlEvent(int col, int press)
 	{
 		<<< "control event", col, press >>>;
 	}
 
-	fun void matrix_event(int row, int col, int press)
+	fun void matrixEvent(int row, int col, int press)
 	{
 		<<< "matrix event", row, col, press >>>;
 	}
 
-	fun void scene_event(int row, int press)
+	fun void sceneEvent(int row, int press)
 	{
 		<<< "scene event", row, press >>>;
 	}
@@ -85,17 +85,17 @@ public class Launchpad
 		lp_out.send(msg_lp_out);
 	}
 
-	fun void matrix_led(int row, int col, int color)
+	fun void matrixLed(int row, int col, int color)
 	{
 		send3(0x90, row*16 + col, color);
 	}
 
-	fun void scene_led(int row, int color)
+	fun void sceneLed(int row, int color)
 	{
 		send3(0x90, row*16 + 8, color);
 	}
 
-	fun void ctrl_led(int col, int color)
+	fun void controlLed(int col, int color)
 	{
 		send3(0xB0, 104+col, color);
 	}

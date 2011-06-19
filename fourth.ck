@@ -20,13 +20,13 @@ public class Fourth extends Launchpad
 		<<< "connected to the synth" >>>;
 	}
 
-	fun void matrix_event(int row, int col, int press)
+	fun void matrixEvent(int row, int col, int press)
 	{
 		0x90 => msg_synth_out.data1;
 		octave*12 + row + col * 4 => msg_synth_out.data2;
 		127 * press => msg_synth_out.data3;
 		synth_out.send(msg_synth_out);
-		matrix_led(row,col,press*127);
+		matrixLed(row,col,press*127);
 	}
 }
 
