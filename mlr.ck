@@ -7,36 +7,26 @@ public class Mlr extends Launchpad
 		this @=> track[i].parent;
 		i => track[i].group;
 	}
-	
-	fun void matrixEvent(int row, int col, int press)
-	{
-		if (!press) return;
-		track[row] @=> Track t;
-		if (!t.isLoaded()) return;
-		t.play(col);
-	}
-	
-	fun void sceneEvent(int row, int press)
-	{
-		if (!press) return;
-		track[row] @=> Track t;
-		if (!t.isLoaded()) return;
-		
-		if (t.playing)
-		{
-			t.stop();
-		}
-		else
-		{
-			t.play(0);
-		}
-	}
 
-	fun void display()
+	fun void keyEvent(int row, int col, int press)
 	{
-		while (true)
-		{
-			
+		if (row == -1) return; // discard control events
+		if (!press) return; // discard release events
+		
+		track[row] @=> Track t;
+		
+		if (col < 8) { // matrix event
+			if (!t.isLoaded()) return;
+			groupStop(row);
+			t.play(col);
+		} else { // scene event
+			if (!t.isLoaded()) return;
+			if (t.playing) {
+				t.stop();
+			} else {
+				groupStop(row);
+				t.play(0);
+			}
 		}
 	}
 	
