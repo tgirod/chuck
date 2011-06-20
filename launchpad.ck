@@ -8,10 +8,11 @@ public class Launchpad
 	MidiOut lp_out;
 	MidiMsg msg_lp_out;
 
-	//key states
-	int matrix_key[8][8];
-	int scene_key[8];
-	int ctrl_key[8];
+	//keys state
+	int key_state[9][9];
+	
+	//leds state
+	int led_state[9][9];
 	
 	fun void connect(int lp_id)
 	{
@@ -44,37 +45,22 @@ public class Launchpad
 				{
 					msg_lp_in.data2 - 104 => col;
 					msg_lp_in.data3 != 0 => press;
-					press => ctrl_key[col];
-					controlEvent(col,press);
+					press => key_state[8][col];
+					keyEvent(-1,col,press);
 				} else {
 					msg_lp_in.data2 / 16 $ int => row;
 					msg_lp_in.data2 % 16 $ int => col;
 					msg_lp_in.data3 != 0 => press;
-					if (col < 8) {
-						press => matrix_key[row][col];
-						matrixEvent(row,col,press);
-					} else {
-						press => scene_key[row];
-						sceneEvent(row,press);
-					}
+					press => key_state[row][col];
+					keyEvent(row,col,press);
 				}
 			}
 		}
 	}
 
-	fun void controlEvent(int col, int press)
+	fun void keyEvent(int row, int col, int press)
 	{
-		<<< "control event", col, press >>>;
-	}
-
-	fun void matrixEvent(int row, int col, int press)
-	{
-		<<< "matrix event", row, col, press >>>;
-	}
-
-	fun void sceneEvent(int row, int press)
-	{
-		<<< "scene event", row, press >>>;
+		<<< "key event", row, col, press >>>;
 	}
 	
 	fun void send3(int data1, int data2, int data3)
@@ -85,34 +71,32 @@ public class Launchpad
 		lp_out.send(msg_lp_out);
 	}
 
-	fun void matrixLed(int row, int col, int color)
+	fun void setColor(int row, int col, int color)
 	{
-		send3(0x90, row*16 + col, color);
+		if (row == -1) {
+			color => led_state[8][col];
+			send3(0xB0, 104+col, color);
+		} else {
+			color => led_state[row][col];
+			send3(0x90, row*16 + col, color);
+		}
 	}
 
-	fun void sceneLed(int row, int color)
+	fun int getColor(int row, int col)
 	{
-		send3(0x90, row*16 + 8, color);
-	}
-
-	fun void controlLed(int col, int color)
-	{
-		send3(0xB0, 104+col, color);
+		if (row == -1) {
+			return led_state[8][col];
+		} else {
+			return led_state[row][col];
+		}
 	}
 	
-	fun int matrixIsPressed(int row, int col)
+	fun int isPressed(int row, int col)
 	{
-		return matrix_key[row][col];
-	}
-
-	fun int sceneIsPressed(int row)
-	{
-		return scene_key[row];
-	}
-
-	fun int controlIsPressed(int col)
-	{
-		return ctrl_key[col];
+		if (row == -1) {
+			return key_state[8][col];
+		} else {
+			return key_state[row][col];
+		}
 	}
 }
-
