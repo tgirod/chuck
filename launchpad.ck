@@ -8,10 +8,10 @@ public class Launchpad
 	MidiOut lp_out;
 	MidiMsg msg_lp_out;
 
-	//state
-	int matrix_button[8][8];
-	int scene_button[8];
-	int ctrl_button[8];
+	//key states
+	int matrix_key[8][8];
+	int scene_key[8];
+	int ctrl_key[8];
 	
 	fun void connect(int lp_id)
 	{
@@ -44,17 +44,17 @@ public class Launchpad
 				{
 					msg_lp_in.data2 - 104 => col;
 					msg_lp_in.data3 != 0 => press;
-					press => ctrl_button[col];
+					press => ctrl_key[col];
 					controlEvent(col,press);
 				} else {
 					msg_lp_in.data2 / 16 $ int => row;
 					msg_lp_in.data2 % 16 $ int => col;
 					msg_lp_in.data3 != 0 => press;
 					if (col < 8) {
-						press => matrix_button[row][col];
+						press => matrix_key[row][col];
 						matrixEvent(row,col,press);
 					} else {
-						press => scene_button[row];
+						press => scene_key[row];
 						sceneEvent(row,press);
 					}
 				}
@@ -102,17 +102,17 @@ public class Launchpad
 	
 	fun int matrixIsPressed(int row, int col)
 	{
-		return matrix_button[row][col];
+		return matrix_key[row][col];
 	}
 
 	fun int sceneIsPressed(int row)
 	{
-		return scene_button[row];
+		return scene_key[row];
 	}
 
-	fun int ctrlIsPressed(int col)
+	fun int controlIsPressed(int col)
 	{
-		return ctrl_button[col];
+		return ctrl_key[col];
 	}
 }
 
