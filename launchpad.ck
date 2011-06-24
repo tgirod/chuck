@@ -81,7 +81,13 @@ public class Launchpad
 			send3(0x90, row*16 + col, color);
 		}
 	}
-
+	
+	fun void setColor(int row, int col, int red, int green)
+	{
+		red + (green * 0x10) + 0x0c => int color;
+		setColor(row, col, color);
+	}
+	
 	fun int getColor(int row, int col)
 	{
 		if (row == -1) {
