@@ -1,5 +1,7 @@
 public class Mlr extends Launchpad
 {
+	static Mlr singleton;
+	
 	120 => float bpm;
 	Track track[8];
 	for (0 => int i; i<8; i++)
@@ -7,7 +9,7 @@ public class Mlr extends Launchpad
 		this @=> track[i].parent;
 		i => track[i].group;
 	}
-
+	
 	fun void keyEvent(int row, int col, int press)
 	{
 		if (row == -1) return; // discard control events
@@ -29,6 +31,14 @@ public class Mlr extends Launchpad
 			}
 		}
 	}
+
+	fun void clearRow(int row)
+	{
+		for (0 => int i; i<9; i++)
+		{
+			if (getColor(row,i) != 0) setColor(row,i,0);
+		}
+	}
 	
 	fun void groupStop(int t)
 	{
@@ -41,7 +51,7 @@ public class Mlr extends Launchpad
 			}
 		}
 	}
-
+	
 	fun void pitch()
 	{
 		for (0 => int i; i<8; i++)
@@ -62,29 +72,65 @@ public class Mlr extends Launchpad
 	}
 }
 
+class PlayEvent extends Event
+{
+	int step;
+}
+
+class StopEvent extends Event
+{}
+
 class Track
 {
 	Mlr @ parent;
 	SndBuf buf;
 	int beats;
 	int group;
-	int playing;
+	int row;
 	int currentStep;
-	time nextStep;
+	time nextUpdate;
+
+	PlayEvent play;
+	StopEvent stop;
+	Shred playing;
+	
+	// load a loop
+	fun void load(Mlr parent, string fname, int beats, int group, int row)
+	{
+		parent @=> this.parent;
+		fname => buf.read;
+		true => buf.loop;
+		beats => this.beats;
+		group => this.group;
+		row => this.row;
+		pitch();
+	}
+	
+	fun void playHandler()
+	{
+		while (true)
+		{
+			play => now;
+			
+		}
+	}
+
+	fun void stopHandler()
+	{
+		if (isPlaying()) {
+			playing.exit();
+			parent.clearRow(row);
+		}
+	}
 	
 	fun int isLoaded()
 	{
 		return buf.samples() != 0;
 	}
 	
-	// load a loop
-	fun void load(string fname, int beats, int group)
+	fun int isPlaying()
 	{
-		fname => buf.read;
-		true => buf.loop;
-		beats => this.beats;
-		group => this.group;
-		pitch();
+		return (playing != null);
 	}
 	
 	fun dur trackLength()
@@ -108,7 +154,6 @@ class Track
 	{
 		step % 8 => currentStep;
 		step * buf.samples() / 8 => buf.pos;
-		now + stepLength() => nextStep;
 		
 		if (!playing)
 		{
