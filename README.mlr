@@ -1,0 +1,27 @@
+Here is how to use the mlr :
+
+%> chuck launchpad.ck mlr.ck yourscript.ck
+
+with "yourscript.ck" looking like this :
+
+Mlr m;
+m.setBpm(130);
+
+JCRev r => dac;
+0.1 => r.mix;
+
+// the parameters are :
+// - row number
+// - filename
+// - number of beats in the loop
+// - track group (only one track of the group is played at once)
+// - output UGen (so you can route each track wherever you want)
+
+m.load(0, "loop1.wav",16,0,r);
+m.load(1,"loop2.wav",8,1,dac);
+m.load(2,"loop3.wav",16,2,r);
+
+// start everything - the parameter is the MIDI port number for the launchpad
+// (you can find it with the command "chuck --probe")
+
+m.start(1);
