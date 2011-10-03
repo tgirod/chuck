@@ -13,7 +13,7 @@ public class Launchpad
 	
 	//leds state
 	int led_state[9][9];
-	
+
 	fun void connect(int lp_id)
 	{
 		// open the midi ports
@@ -27,9 +27,9 @@ public class Launchpad
 			me.exit();
 		}
 
-		send3(176,0,0);
-		
-		<<< "connected to the launchpad" >>>;
+		<<< "[launchpad] connected" >>>;
+		<<< "[launchpad] reset" >>>;
+		send3(176,0,0);	
 	}
 	
 	fun void listen()
@@ -79,12 +79,12 @@ public class Launchpad
 			8 => row;
 		}
 		
-		if (led_state[row][col] != col) {
+		if (led_state[row][col] != color) {
 			color => led_state[row][col];
 			if (row == 8) {
-				send3(0xB0, 104+col, color);
+				send3(176, 104+col, color);
 			} else {
-				send3(0x90, row*16 + col, color);
+				send3(144, row*16 + col, color);
 			}
 		}
 	}
