@@ -1,6 +1,5 @@
 public class Mlr extends Launchpad
 {
-	static Mlr singleton;
 	
 	120 => float bpm;
 	Track track[8];
@@ -16,14 +15,13 @@ public class Mlr extends Launchpad
 		if (!press) return; // discard release events
 		
 		track[row] @=> Track t;
+		if (!t.isLoaded()) return; // discard if the track is not loaded
 		
 		if (col < 8) { // matrix event
-			if (!t.isLoaded()) return;
 			groupStop(row);
 			t.play(col);
 		} else { // scene event
-			if (!t.isLoaded()) return;
-			if (t.playing) {
+			if (t.isPlaying()) {
 				t.stop();
 			} else {
 				groupStop(row);
@@ -39,7 +37,7 @@ public class Mlr extends Launchpad
 			if (getColor(row,i) != 0) setColor(row,i,0);
 		}
 	}
-	
+
 	fun void groupStop(int t)
 	{
 		track[t].group => int g;
@@ -62,7 +60,7 @@ public class Mlr extends Launchpad
 	
 	fun void load(int t, string fname, int beats, int group)
 	{
-		track[t].load(fname, beats, group);
+		track[t].load(this, fname, beats, group, t);
 	}
 
 	fun void setBpm(int bpm)
@@ -71,14 +69,6 @@ public class Mlr extends Launchpad
 		pitch();
 	}
 }
-
-class PlayEvent extends Event
-{
-	int step;
-}
-
-class StopEvent extends Event
-{}
 
 class Track
 {
@@ -90,9 +80,7 @@ class Track
 	int currentStep;
 	time nextUpdate;
 
-	PlayEvent play;
-	StopEvent stop;
-	Shred playing;
+	int playing;
 	
 	// load a loop
 	fun void load(Mlr parent, string fname, int beats, int group, int row)
@@ -103,26 +91,10 @@ class Track
 		beats => this.beats;
 		group => this.group;
 		row => this.row;
+		0 => playing;
 		pitch();
 	}
-	
-	fun void playHandler()
-	{
-		while (true)
-		{
-			play => now;
-			
-		}
-	}
-
-	fun void stopHandler()
-	{
-		if (isPlaying()) {
-			playing.exit();
-			parent.clearRow(row);
-		}
-	}
-	
+		
 	fun int isLoaded()
 	{
 		return buf.samples() != 0;
@@ -130,7 +102,7 @@ class Track
 	
 	fun int isPlaying()
 	{
-		return (playing != null);
+		return playing;
 	}
 	
 	fun dur trackLength()
@@ -171,9 +143,3 @@ class Track
 		}
 	}
 }
-
-// Mlr m;
-// 180 => m.bpm;
-// m.load(0,"/home/tom/Audio/chuck/drum/altan_Seq01_amen.wav",16,0);
-// m.connect(1);
-// m.listen();
