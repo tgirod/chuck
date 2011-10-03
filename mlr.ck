@@ -63,6 +63,16 @@ public class Mlr extends Launchpad
 		track[t].load(this, fname, beats, group, t, output);
 	}
 
+	fun void load(int t, string fname, int beats, int group)
+	{
+		track[t].load(this, fname, beats, group, t, dac);
+	}
+
+	fun void load(int t, string fname, int beats)
+	{
+		track[t].load(this, fname, beats, t, t, dac);
+	}
+
 	fun void setBpm(int bpm)
 	{
 		bpm => this.bpm;
