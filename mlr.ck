@@ -58,9 +58,9 @@ public class Mlr extends Launchpad
 		}
 	}
 	
-	fun void load(int t, string fname, int beats, int group)
+	fun void load(int t, string fname, int beats, int group, UGen output)
 	{
-		track[t].load(this, fname, beats, group, t);
+		track[t].load(this, fname, beats, group, t, output);
 	}
 
 	fun void setBpm(int bpm)
@@ -116,6 +116,7 @@ public class Mlr extends Launchpad
 class Track
 {
 	Mlr @ parent;
+	UGen @ output;
 	SndBuf buf;
 	int beats;
 	int group;
@@ -123,11 +124,12 @@ class Track
 	int currentStep;
 	time nextUpdate;
 	int playing;
-
+	
 	// load a loop
-	fun void load(Mlr parent, string fname, int beats, int group, int row)
+	fun void load(Mlr parent, string fname, int beats, int group, int row, UGen output)
 	{
 		parent @=> this.parent;
+		output @=> this.output;
 		fname => buf.read;
 		true => buf.loop;
 		beats => this.beats;
@@ -171,7 +173,7 @@ class Track
 		now + stepLength() => nextUpdate;
 		
 		if (!playing) {
-			buf => dac;
+			buf => output;
 			true => playing;
 		}
 	}
@@ -179,8 +181,13 @@ class Track
 	fun void stop()
 	{
 		if (playing) {
-			buf !=> dac;
+			buf !=> output;
 			false => playing;
 		}
+	}
+
+	fun void setOutput(UGen u)
+	{
+		u @=> output;
 	}
 }
