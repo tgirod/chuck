@@ -91,7 +91,7 @@ public class Launchpad
 	
 	fun void setColor(int row, int col, int red, int green)
 	{
-		red + (green * 0x10) + 0x0c => int color;
+		red + (green * 16) + 12 => int color;
 		setColor(row, col, color);
 	}
 	
