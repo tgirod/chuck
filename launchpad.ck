@@ -26,6 +26,8 @@ public class Launchpad
 			<<< "can't open midi in" >>>;
 			me.exit();
 		}
+
+		send3(176,0,0);
 		
 		<<< "connected to the launchpad" >>>;
 	}
@@ -70,15 +72,20 @@ public class Launchpad
 		data3 => msg_lp_out.data3;
 		lp_out.send(msg_lp_out);
 	}
-
+	
 	fun void setColor(int row, int col, int color)
 	{
 		if (row == -1) {
-			color => led_state[8][col];
-			send3(0xB0, 104+col, color);
-		} else {
+			8 => row;
+		}
+		
+		if (led_state[row][col] != col) {
 			color => led_state[row][col];
-			send3(0x90, row*16 + col, color);
+			if (row == 8) {
+				send3(0xB0, 104+col, color);
+			} else {
+				send3(0x90, row*16 + col, color);
+			}
 		}
 	}
 	
@@ -91,18 +98,16 @@ public class Launchpad
 	fun int getColor(int row, int col)
 	{
 		if (row == -1) {
-			return led_state[8][col];
-		} else {
-			return led_state[row][col];
+			8 => row;
 		}
+		return led_state[row][col];
 	}
 	
 	fun int isPressed(int row, int col)
 	{
 		if (row == -1) {
-			return key_state[8][col];
-		} else {
-			return key_state[row][col];
+			8 => row;
 		}
+		return key_state[row][col];
 	}
 }
