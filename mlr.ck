@@ -58,22 +58,22 @@ public class Mlr extends Launchpad
 		}
 	}
 	
-	fun void load(int t, string fname, int beats, int group, UGen output)
+	fun void load(int t, string fname, int beats, int group, float gain, UGen output)
 	{
-		track[t].load(this, fname, beats, group, t, output);
+		track[t].load(this, fname, beats, group, t, gain, output);
 	}
 
-	fun void load(int t, string fname, int beats, int group)
+	fun void load(int t, string fname, int beats, int group, float gain)
 	{
-		track[t].load(this, fname, beats, group, t, dac);
+		track[t].load(this, fname, beats, group, t, gain, dac);
 	}
 
 	fun void load(int t, string fname, int beats)
 	{
-		track[t].load(this, fname, beats, t, t, dac);
+		track[t].load(this, fname, beats, t, t, 1.0, dac);
 	}
 
-	fun void setBpm(int bpm)
+	fun void setBpm(float bpm)
 	{
 		bpm => this.bpm;
 		pitch();
@@ -136,10 +136,11 @@ class Track
 	int playing;
 	
 	// load a loop
-	fun void load(Mlr parent, string fname, int beats, int group, int row, UGen output)
+	fun void load(Mlr parent, string fname, int beats, int group, int row, float gain, UGen output)
 	{
 		parent @=> this.parent;
 		output @=> this.output;
+		gain => buf.gain;
 		fname => buf.read;
 		true => buf.loop;
 		beats => this.beats;
