@@ -5,12 +5,18 @@ Here is how to use the mlr :
 with "yourscript.ck" looking like this :
 
 Mlr m;
-m.setBpm(130);
+
+// the parameters are:
+// - bpm (general speed)
+// - length (number of beats for the sequencer)
+// - quantize (number of ticks in one beat for the sequencer)
+
+m.init(130,8,2);
 
 JCRev r => dac;
 0.1 => r.mix;
 
-// the parameters are :
+// the parameters are:
 // - row number
 // - filename
 // - number of beats in the loop
@@ -25,3 +31,14 @@ m.load(2,"loop3.wav",16,2,r);
 // (you can find it with the command "chuck --probe")
 
 m.start(1);
+
+
+THE SEQUENCER
+=============
+
+the sequencer allows you to record a sequence of key press and loop it.
+
+- The sequence's length is set with Mlr.init.
+- To switch to/from "learn mode", press the learn button. 
+- To erase a sequence, press the scene button of the corresponding track.
+- To restart the sequencer, press the blinking mixer button
